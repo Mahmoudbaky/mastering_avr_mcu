@@ -23,11 +23,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  000002b8  00000000  00000000  000030f4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000885  00000000  00000000  000033ac  2**0
+ 10 .debug_str    000008bc  00000000  00000000  000033ac  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000c24  00000000  00000000  00003c31  2**0
+ 11 .debug_loc    00000c24  00000000  00000000  00003c68  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000118  00000000  00000000  00004855  2**0
+ 12 .debug_ranges 00000118  00000000  00000000  0000488c  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -134,12 +134,6 @@ int main(void)
   b2:	ff cf       	rjmp	.-2      	; 0xb2 <main+0x4>
 
 000000b4 <gpio_pin_direction_inti>:
-	else{
-		*logic = BIT_READ((*pin_registers[_pin_config->port]),_pin_config->pin);
-	}
-	
-	return ret;
-}
   b4:	fc 01       	movw	r30, r24
   b6:	89 2b       	or	r24, r25
   b8:	d1 f1       	breq	.+116    	; 0x12e <gpio_pin_direction_inti+0x7a>
@@ -273,12 +267,6 @@ int main(void)
  1b4:	08 95       	ret
 
 000001b6 <gpio_pin_toggle_logic>:
-#endif
-
-#if GPIO_PIN_CONFIGURATION == CONFIG_ENABLE
-Std_ReturnType gpio_pin_toggle_logic         (const pin_config_t *_pin_config){
-	Std_ReturnType ret = E_OK ;
-	if ((NULL == _pin_config) || (_pin_config->pin > (MAX_NUMBER_OF_BINS-1))){
  1b6:	00 97       	sbiw	r24, 0x00	; 0
  1b8:	d1 f0       	breq	.+52     	; 0x1ee <gpio_pin_toggle_logic+0x38>
  1ba:	dc 01       	movw	r26, r24
@@ -287,10 +275,6 @@ Std_ReturnType gpio_pin_toggle_logic         (const pin_config_t *_pin_config){
  1c0:	26 95       	lsr	r18
  1c2:	26 95       	lsr	r18
  1c4:	27 70       	andi	r18, 0x07	; 7
-		ret = E_NOT_OK;
-	}
-	else{
-		TOGGLE_BIT((*port_registers[_pin_config->port]),_pin_config->pin);
  1c6:	ec 91       	ld	r30, X
  1c8:	e7 70       	andi	r30, 0x07	; 7
  1ca:	f0 e0       	ldi	r31, 0x00	; 0
@@ -311,28 +295,15 @@ Std_ReturnType gpio_pin_toggle_logic         (const pin_config_t *_pin_config){
  1e8:	e2 f7       	brpl	.-8      	; 0x1e2 <gpio_pin_toggle_logic+0x2c>
  1ea:	83 27       	eor	r24, r19
  1ec:	80 83       	st	Z, r24
-	}
-}
  1ee:	08 95       	ret
 
 000001f0 <gpio_pin_initialization>:
-#endif
-
-#if GPIO_PIN_CONFIGURATION == CONFIG_ENABLE
-Std_ReturnType gpio_pin_initialization       (const pin_config_t *_pin_config){
  1f0:	cf 93       	push	r28
  1f2:	df 93       	push	r29
-	Std_ReturnType ret = E_OK ;
-	if ((NULL == _pin_config) || (_pin_config->pin > (MAX_NUMBER_OF_BINS-1))){
  1f4:	00 97       	sbiw	r24, 0x00	; 0
  1f6:	59 f0       	breq	.+22     	; 0x20e <gpio_pin_initialization+0x1e>
  1f8:	ec 01       	movw	r28, r24
-		ret = E_NOT_OK;
-	}
-	else{
-		ret = gpio_pin_direction_inti(_pin_config);
  1fa:	0e 94 5a 00 	call	0xb4	; 0xb4 <gpio_pin_direction_inti>
-		ret = gpio_pin_write_logic(_pin_config , _pin_config->logic);
  1fe:	68 81       	ld	r22, Y
  200:	67 fb       	bst	r22, 7
  202:	66 27       	eor	r22, r22
@@ -340,30 +311,12 @@ Std_ReturnType gpio_pin_initialization       (const pin_config_t *_pin_config){
  206:	ce 01       	movw	r24, r28
  208:	0e 94 9b 00 	call	0x136	; 0x136 <gpio_pin_write_logic>
  20c:	01 c0       	rjmp	.+2      	; 0x210 <gpio_pin_initialization+0x20>
-
-#if GPIO_PIN_CONFIGURATION == CONFIG_ENABLE
-Std_ReturnType gpio_pin_initialization       (const pin_config_t *_pin_config){
-	Std_ReturnType ret = E_OK ;
-	if ((NULL == _pin_config) || (_pin_config->pin > (MAX_NUMBER_OF_BINS-1))){
-		ret = E_NOT_OK;
  20e:	80 e0       	ldi	r24, 0x00	; 0
-	else{
-		ret = gpio_pin_direction_inti(_pin_config);
-		ret = gpio_pin_write_logic(_pin_config , _pin_config->logic);
-	}
-	return ret;
-}
  210:	df 91       	pop	r29
  212:	cf 91       	pop	r28
  214:	08 95       	ret
 
 00000216 <Interrupt_INTx_Enable>:
-
-
-Std_ReturnType INTx_interrupt_DeInit(const interrupt_INTx_t *int_obj){
-	
-	
-}
  216:	00 97       	sbiw	r24, 0x00	; 0
  218:	01 f1       	breq	.+64     	; 0x25a <Interrupt_INTx_Enable+0x44>
  21a:	fc 01       	movw	r30, r24
@@ -681,18 +634,9 @@ Std_ReturnType INTx_interrupt_DeInit(const interrupt_INTx_t *int_obj){
  486:	08 95       	ret
 
 00000488 <INT0_ISR>:
-
-
-void INT0_ISR (void){
-	/* The INT0 external interrupt occurred (must be cleared in software) */
-	EXT_INT0_InterruptFlagClear();
  488:	8a b7       	in	r24, 0x3a	; 58
  48a:	8f 7b       	andi	r24, 0xBF	; 191
  48c:	8a bf       	out	0x3a, r24	; 58
-	/*   code    */
-	
-	/* Application Callback function gets called every time this ISR executes */
-	if(INT0_InterruptHandler){ INT0_InterruptHandler(); }
  48e:	e0 91 7a 00 	lds	r30, 0x007A	; 0x80007a <INT0_InterruptHandler>
  492:	f0 91 7b 00 	lds	r31, 0x007B	; 0x80007b <INT0_InterruptHandler+0x1>
  496:	30 97       	sbiw	r30, 0x00	; 0
@@ -701,12 +645,6 @@ void INT0_ISR (void){
  49c:	08 95       	ret
 
 0000049e <__vector_1>:
-uint8 int0_en_bit = 0;
-
-
-void __vector_1(void) __attribute__((signal));
-void __vector_1(void)
-{
  49e:	1f 92       	push	r1
  4a0:	0f 92       	push	r0
  4a2:	0f b6       	in	r0, 0x3f	; 63
@@ -724,25 +662,16 @@ void __vector_1(void)
  4ba:	bf 93       	push	r27
  4bc:	ef 93       	push	r30
  4be:	ff 93       	push	r31
-	uint8 int0_en_bit_read   = BIT_READ(GICR_T,6);
  4c0:	9b b7       	in	r25, 0x3b	; 59
-	uint8 int0_flag_bit_read = BIT_READ(GIFR_T,6);
  4c2:	8a b7       	in	r24, 0x3a	; 58
  4c4:	86 fb       	bst	r24, 6
  4c6:	88 27       	eor	r24, r24
  4c8:	80 f9       	bld	r24, 0
-	
-	if((INTERRUPT_ENABLE == int0_en_bit_read) && (INTERRUPT_OCCUR == int0_flag_bit_read)){
  4ca:	96 ff       	sbrs	r25, 6
  4cc:	04 c0       	rjmp	.+8      	; 0x4d6 <__vector_1+0x38>
  4ce:	81 30       	cpi	r24, 0x01	; 1
  4d0:	11 f4       	brne	.+4      	; 0x4d6 <__vector_1+0x38>
-		INT0_ISR();
  4d2:	0e 94 44 02 	call	0x488	; 0x488 <INT0_ISR>
-	}
-	else{/* nothing */}
-
-}
  4d6:	ff 91       	pop	r31
  4d8:	ef 91       	pop	r30
  4da:	bf 91       	pop	r27
@@ -762,19 +691,11 @@ void __vector_1(void)
  4f6:	18 95       	reti
 
 000004f8 <__vector_2>:
-
-void __vector_2(void) __attribute__((signal));
-void __vector_2(void)
-{
  4f8:	1f 92       	push	r1
  4fa:	0f 92       	push	r0
  4fc:	0f b6       	in	r0, 0x3f	; 63
  4fe:	0f 92       	push	r0
  500:	11 24       	eor	r1, r1
-	
-	
-	
-}
  502:	0f 90       	pop	r0
  504:	0f be       	out	0x3f, r0	; 63
  506:	0f 90       	pop	r0
@@ -782,18 +703,11 @@ void __vector_2(void)
  50a:	18 95       	reti
 
 0000050c <__vector_3>:
-
-void __vector_3(void) __attribute__((signal));
-void __vector_3(void)
-{
  50c:	1f 92       	push	r1
  50e:	0f 92       	push	r0
  510:	0f b6       	in	r0, 0x3f	; 63
  512:	0f 92       	push	r0
  514:	11 24       	eor	r1, r1
-	
-	
-	
  516:	0f 90       	pop	r0
  518:	0f be       	out	0x3f, r0	; 63
  51a:	0f 90       	pop	r0

@@ -587,16 +587,16 @@ END GROUP
  .debug_frame   0x00000114      0x100 MCAL/INTERRUPT/mcal_external_interrupt.o
  .debug_frame   0x00000214       0xa4 MCAL/INTERRUPT/mcal_interrupt_manager.o
 
-.debug_str      0x00000000      0x885
+.debug_str      0x00000000      0x8bc
  *(.debug_str)
  .debug_str     0x00000000      0x196 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega32/avr5/crtatmega32.o
- .debug_str     0x00000196      0x362 main.o
-                                0x3a1 (size before relaxing)
- .debug_str     0x000004f8      0x165 MCAL/GPIO/mcal_gpio.o
+ .debug_str     0x00000196      0x361 main.o
+                                0x3a0 (size before relaxing)
+ .debug_str     0x000004f7      0x19d MCAL/GPIO/mcal_gpio.o
                                 0x382 (size before relaxing)
- .debug_str     0x0000065d      0x1ac MCAL/INTERRUPT/mcal_external_interrupt.o
+ .debug_str     0x00000694      0x1ac MCAL/INTERRUPT/mcal_external_interrupt.o
                                 0x45c (size before relaxing)
- .debug_str     0x00000809       0x7c MCAL/INTERRUPT/mcal_interrupt_manager.o
+ .debug_str     0x00000840       0x7c MCAL/INTERRUPT/mcal_interrupt_manager.o
                                 0x1f7 (size before relaxing)
 
 .debug_loc      0x00000000      0xc24
