@@ -1,4 +1,2 @@
-build
-dist
-nbproject
-SIM
+AVR_SIM
+Debug

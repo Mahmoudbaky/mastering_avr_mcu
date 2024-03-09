@@ -21,10 +21,24 @@ static InterruptHandler INT0_InterruptHandler = NULL;
 static InterruptHandler INT1_InterruptHandler = NULL;
 static InterruptHandler INT2_InterruptHandler = NULL;
 
+static InterruptHandler INT0_InterruptHandlerHigh = NULL;
+static InterruptHandler INT0_InterruptHandlerLow = NULL;
+
+static InterruptHandler INT1_InterruptHandlerHigh = NULL;
+static InterruptHandler INT1_InterruptHandlerLow = NULL;
+
 static Std_ReturnType Interrupt_Choose_Handler_INTx        (const interrupt_INTx_t *int_obj);
 static Std_ReturnType Interrupt_INT0_MoveAddressFromStruct (void (*InterruptHandler)(void));
 static Std_ReturnType Interrupt_INT1_MoveAddressFromStruct (void (*InterruptHandler)(void));
 static Std_ReturnType Interrupt_INT2_MoveAddressFromStruct (void (*InterruptHandler)(void));
+
+static Std_ReturnType Interrupt_INT0_MoveAddressFromStructHigh (void (*InterruptHandler)(void));
+static Std_ReturnType Interrupt_INT0_MoveAddressFromStructLow  (void (*InterruptHandler)(void));
+
+static Std_ReturnType Interrupt_INT1_MoveAddressFromStructHigh (void (*InterruptHandler)(void));
+static Std_ReturnType Interrupt_INT1_MoveAddressFromStructLow  (void (*InterruptHandler)(void));
+
+
 
 /*  helper functions for INTx  */
 
@@ -45,7 +59,7 @@ Std_ReturnType INTx_interrupt_Init  (const interrupt_INTx_t *int_obj){
 		ret = Interrupt_INTx_Set_Sense (int_obj); 
 		/* Configure External interrupt I/O pin */
 		ret = Interrupt_INTx_Pin_Init(int_obj);
-		/* Configure Default Interrupt CallBack */
+		/* Configure Default Interrupt CallBack */		
 		ret = Interrupt_Choose_Handler_INTx(int_obj);
 		/* Enable the External interrupt */
 		ret = Interrupt_INTx_Enable(int_obj);	
@@ -55,14 +69,20 @@ Std_ReturnType INTx_interrupt_Init  (const interrupt_INTx_t *int_obj){
 
 
 Std_ReturnType INTx_interrupt_DeInit(const interrupt_INTx_t *int_obj){
-	
-	
+	 Std_ReturnType ret = E_OK;
+	 if(NULL == int_obj){
+		 ret = E_NOT_OK;
+	 }
+	 else{
+		 ret = Interrupt_INTx_Disable(int_obj);
+	 }
+	 return ret;
 }
 
 
 void INT0_ISR (void){
 	/* The INT0 external interrupt occurred (must be cleared in software) */
-	EXT_INT0_InterruptFlagClear();
+	// EXT_INT0_InterruptFlagClear();
 	/*   code    */
 	
 	/* Application Callback function gets called every time this ISR executes */
@@ -70,9 +90,30 @@ void INT0_ISR (void){
 	else{ /* Nothing */ }
 }
 
+void INT0_ISR_HIGH (void){
+	/* The INT0 external interrupt occurred (must be cleared in software) */
+	// EXT_INT0_InterruptFlagClear();
+	/*   code    */
+	
+	/* Application Callback function gets called every time this ISR executes */
+	if(INT0_InterruptHandlerHigh){INT0_InterruptHandlerHigh();}
+	else{ /* Nothing */ }
+}
+
+void INT0_ISR_LOW (void){
+	/* The INT0 external interrupt occurred (must be cleared in software) */
+	// EXT_INT0_InterruptFlagClear();
+	/*   code    */
+	
+	/* Application Callback function gets called every time this ISR executes */
+	if(INT0_InterruptHandlerLow){INT0_InterruptHandlerLow();}
+	else{ /* Nothing */ }
+}
+
+
 void INT1_ISR (void){
 	/* The INT1 external interrupt occurred (must be cleared in software) */
-	EXT_INT0_InterruptFlagClear();
+	// EXT_INT0_InterruptFlagClear();
 	/*   code    */
 	
 	/* Application Callback function gets called every time this ISR executes */
@@ -80,9 +121,29 @@ void INT1_ISR (void){
 	else{ /* Nothing */ }
 }
 
+void INT1_ISR_HIGH (void){
+	/* The INT1 external interrupt occurred (must be cleared in software) */
+	// EXT_INT0_InterruptFlagClear();
+	/*   code    */
+	
+	/* Application Callback function gets called every time this ISR executes */
+	if(INT1_InterruptHandlerHigh){ INT1_InterruptHandlerHigh(); }
+	else{ /* Nothing */ }
+}
+
+void INT1_ISR_LOW (void){
+	/* The INT1 external interrupt occurred (must be cleared in software) */
+	// EXT_INT0_InterruptFlagClear();
+	/*   code    */
+	
+	/* Application Callback function gets called every time this ISR executes */
+	if(INT1_InterruptHandlerLow){INT1_InterruptHandlerLow();}
+	else{ /* Nothing */ }
+}
+
 void INT2_ISR (void){
 	/* The INT2 external interrupt occurred (must be cleared in software) */
-	EXT_INT0_InterruptFlagClear();
+	//EXT_INT0_InterruptFlagClear();
 	/*   code    */
 	
 	/* Application Callback function gets called every time this ISR executes */
@@ -172,10 +233,10 @@ static Std_ReturnType Interrupt_INTx_Set_Sense    (const interrupt_INTx_t *int_o
 	else{
 		switch(int_obj->source){
 			case INTERRUPT_EXTERNAL_INT0 :
-				if(LOW_LEVEL == int_obj->sense)        { EXT_INT0_LowLevelSense(); }
-				else if(ON_CHANGE == int_obj->sense)   { EXT_INT0_OnChangeSense(); }
-				else if(FALLING_EDGE == int_obj->sense){ EXT_INT0_FallingEdgeSense(); }
-				else if(RISING_EDGE == int_obj->sense) { EXT_INT0_RisingEdgeSense(); }
+				if(LOW_LEVEL == int_obj->sense){ EXT_INT0_LowLevelSense();}
+				else if(ON_CHANGE == int_obj->sense){ EXT_INT0_OnChangeSense();}
+				else if(FALLING_EDGE == int_obj->sense){EXT_INT0_FallingEdgeSense();}
+				else if(RISING_EDGE == int_obj->sense) { EXT_INT0_RisingEdgeSense();}
 				else {/*nothing*/}	
 				break;
 			case INTERRUPT_EXTERNAL_INT1 :
@@ -213,19 +274,35 @@ static Std_ReturnType Interrupt_Choose_Handler_INTx (const interrupt_INTx_t *int
 		ret = E_NOT_OK;
 	}
 	else{
-		switch(int_obj->source){
-			case INTERRUPT_EXTERNAL_INT0 :
+		if(int_obj->sense == ON_CHANGE){
+			switch(int_obj->source){
+				case INTERRUPT_EXTERNAL_INT0:
+					ret = Interrupt_INT0_MoveAddressFromStructHigh(int_obj->EXT_InterruptHandlerHigh);
+					ret = Interrupt_INT0_MoveAddressFromStructLow(int_obj->EXT_InterruptHandlerLow);
+					break;
+				case INTERRUPT_EXTERNAL_INT1:
+					ret = Interrupt_INT1_MoveAddressFromStructHigh(int_obj->EXT_InterruptHandlerHigh);
+					ret = Interrupt_INT1_MoveAddressFromStructLow(int_obj->EXT_InterruptHandlerLow);
+					break;
+				default : ret = E_NOT_OK;		
+			}
+		}
+		else {
+			switch(int_obj->source){
+				case INTERRUPT_EXTERNAL_INT0 :
 				ret = Interrupt_INT0_MoveAddressFromStruct(int_obj->EXT_InterruptHandler);
 				break;
-			case INTERRUPT_EXTERNAL_INT1 :
+				case INTERRUPT_EXTERNAL_INT1 :
 				ret = Interrupt_INT1_MoveAddressFromStruct(int_obj->EXT_InterruptHandler);
 				break;
-			case INTERRUPT_EXTERNAL_INT2 :
+				case INTERRUPT_EXTERNAL_INT2 :
 				ret = Interrupt_INT2_MoveAddressFromStruct(int_obj->EXT_InterruptHandler);
 				break;
-			default : ret = E_NOT_OK;
-		}
-	}
+				default : ret = E_NOT_OK; 
+				}  
+				
+		} 
+}
 	return ret;
 }
 
@@ -262,6 +339,52 @@ static Std_ReturnType Interrupt_INT2_MoveAddressFromStruct (void (*InterruptHand
 	}
 	return ret;
 	
+}
+
+
+static Std_ReturnType Interrupt_INT0_MoveAddressFromStructHigh (void (*InterruptHandler)(void)){
+	Std_ReturnType ret = E_OK;
+	if(NULL == InterruptHandler){
+		ret = E_NOT_OK;
+	}
+	else{
+		INT0_InterruptHandlerHigh = InterruptHandler;
+	}
+	return ret;
+}
+
+static Std_ReturnType Interrupt_INT0_MoveAddressFromStructLow  (void (*InterruptHandler)(void)){
+	Std_ReturnType ret = E_OK;
+	if(NULL == InterruptHandler){
+		ret = E_NOT_OK;
+	}
+	else{
+		INT0_InterruptHandlerLow = InterruptHandler;
+	}
+	return ret;
+}
+
+
+static Std_ReturnType Interrupt_INT1_MoveAddressFromStructHigh (void (*InterruptHandler)(void)){
+	Std_ReturnType ret = E_OK;
+	if(NULL == InterruptHandler){
+		ret = E_NOT_OK;
+	}
+	else{
+		INT1_InterruptHandlerHigh = InterruptHandler;
+	}
+	return ret;
+}
+
+static Std_ReturnType Interrupt_INT1_MoveAddressFromStructLow  (void (*InterruptHandler)(void)){
+	Std_ReturnType ret = E_OK;
+	if(NULL == InterruptHandler){
+		ret = E_NOT_OK;
+	}
+	else{
+		INT1_InterruptHandlerLow = InterruptHandler;
+	}
+	return ret;
 }
 
 /*  helper functions for INTx  */

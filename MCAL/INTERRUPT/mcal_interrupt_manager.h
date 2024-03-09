@@ -25,5 +25,8 @@
 void INT0_ISR (void);
 void INT1_ISR (void);
 void INT2_ISR (void);
-
+void INT0_ISR_HIGH (void);
+void INT0_ISR_LOW (void);
+void INT1_ISR_HIGH (void);
+void INT1_ISR_LOW (void);
 #endif /* MCAL_INTERRUPT_MANAGER_H_ */

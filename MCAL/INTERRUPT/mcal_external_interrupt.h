@@ -32,10 +32,10 @@
 
 /*  INT_0 AND INT_1 SENSE MODE  */
 
-#define INT0_SENSE_LOW_LEVEL     CLEAR_BIT(MCUCR_T,1) | CLEAR_BIT(MCUCR_T,0)
-#define INT0_SENSE_ON_CHANGE     CLEAR_BIT(MCUCR_T,1) | SET_BIT(MCUCR_T,0)
-#define INT0_SENSE_FALLING_EDGE  SET_BIT(MCUCR_T,1)   | CLEAR_BIT(MCUCR_T,0)
-#define INT0_SENSE_RISING_EDGE   SET_BIT(MCUCR_T,1)   | SET_BIT(MCUCR_T,0)
+#define INT0_SENSE_LOW_LEVEL     CLEAR_BIT(MCUCR_T,1)|CLEAR_BIT(MCUCR_T,0)
+#define INT0_SENSE_ON_CHANGE     CLEAR_BIT(MCUCR_T,1)|SET_BIT(MCUCR_T,0)
+#define INT0_SENSE_FALLING_EDGE  SET_BIT(MCUCR_T,1)|CLEAR_BIT(MCUCR_T,0)
+#define INT0_SENSE_RISING_EDGE   SET_BIT(MCUCR_T,1)|SET_BIT(MCUCR_T,0)
 
 #define INT1_SENSE_LOW_LEVEL     CLEAR_BIT(MCUCR_T,3) | CLEAR_BIT(MCUCR_T,2)
 #define INT1_SENSE_ON_CHANGE     CLEAR_BIT(MCUCR_T,3) | SET_BIT(MCUCR_T,2)
@@ -114,6 +114,8 @@ typedef enum{
 
 typedef struct{
 	void (* EXT_InterruptHandler)(void);
+	void (* EXT_InterruptHandlerHigh)(void);
+	void (* EXT_InterruptHandlerLow)(void);
 	pin_config_t           mcu_pin;
 	sense_mode_t           sense;
 	interrupt_INTx_src     source;
