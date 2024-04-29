@@ -1,2 +1,2 @@
 # my_avr
-ATMega32 
+learning avr microcontroller peripherals
